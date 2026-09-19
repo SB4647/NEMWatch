@@ -14,6 +14,10 @@ class Settings(BaseSettings):
     history_default_limit: int = 500
     history_max_limit: int = 5_000
     acknowledgement_note_max_length: int = 500
+    aemo_connect_timeout_seconds: float = 5.0
+    aemo_read_timeout_seconds: float = 15.0
+    aemo_max_response_bytes: int = 10_000_000
+    aemo_user_agent: str = "NEMWatch/0.1 educational-project"
 
     model_config = SettingsConfigDict(
         env_file=".env",

@@ -4,4 +4,6 @@ NEMWatch will use only public data published by the Australian Energy Market Ope
 
 Employer data, private operational data, credentials, and confidential material must never be added to this repository. NEMWatch is an educational project and is not a trading, dispatch, or operational control system.
 
-The precise public dispatch file, source URL, attribution, and fields will be documented when Milestone 3 adds the first fixture. Until then, the project does not claim to ingest or display live market data.
+The required offline demonstration uses `backend/data/fixtures/dispatch_sample.csv`. Its adjacent `ATTRIBUTION.md` identifies AEMO's public NEMWeb source page, the fields retained, and the deterministic normalization applied. The fixture is educational and must not be interpreted as live market information.
+
+Network retrieval is optional. When enabled, NEMWatch accepts only HTTPS, sends an identifying user agent, limits time and response size, retries a bounded number of times, and reports failures without exposing connection details.

@@ -1,5 +1,19 @@
 # NEMWatch Learning Log
 
+## Milestone 3 Deterministic ingestion
+
+### Concept
+
+Batch ingestion should isolate bad input at the row boundary. One corrupt value becomes a typed rejection that can be counted and inspected without discarding valid observations that follow it.
+
+### Project example
+
+The checked-in fixture contains 15 valid observations and four deliberate errors. The parser returns all 15 records plus four reason-coded rejections without exposing full raw rows.
+
+### Deferred verification
+
+Parser, fixture-count, and client-boundary cases are checked in now. They run with the complete suite during consolidated stabilization.
+
 ## Milestone 2 Persistent market domain
 
 ### Concept
