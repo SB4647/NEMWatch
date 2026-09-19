@@ -1,16 +1,26 @@
 <script setup lang="ts">
-const projectSummary = 'Australian National Electricity Market monitoring and alerting'
+import { api } from './api/client'
+import AlertList from './components/AlertList.vue'
+import HistoryPanel from './components/HistoryPanel.vue'
+import RegionOverview from './components/RegionOverview.vue'
+import StatusBanner from './components/StatusBanner.vue'
+import { useMarketDashboard } from './composables/useMarketDashboard'
+
+const dashboard = useMarketDashboard(api)
 </script>
 
 <template>
   <main class="shell">
-    <section class="hero" aria-labelledby="page-title">
-      <p class="eyebrow">Local development shell</p>
-      <h1 id="page-title">NEMWatch</h1>
-      <p class="summary">{{ projectSummary }}</p>
-      <p class="disclaimer">
-        Educational use only. Not a trading, dispatch, or operational control system.
-      </p>
-    </section>
+    <header class="hero" aria-labelledby="page-title">
+      <div><p class="eyebrow">National Electricity Market monitor</p><h1 id="page-title">NEMWatch</h1><p class="summary">Regional prices, demand, event-driven alerts, and repeatable historical playback.</p></div>
+      <p class="disclaimer">Educational use only. Not a trading, dispatch, or operational control system. Fixture values are not current market information.</p>
+    </header>
+    <StatusBanner :loading="dashboard.loading.value" :error="dashboard.error.value" @retry="dashboard.refresh" />
+    <RegionOverview :regions="dashboard.regions.value" :latest-by-region="dashboard.latestByRegion.value" />
+    <div class="content-grid">
+      <HistoryPanel v-model:selected-region="dashboard.selectedRegion.value" :regions="dashboard.regions.value" :items="dashboard.history.value" :loading="dashboard.historyLoading.value" @load="dashboard.loadHistory" />
+      <AlertList :alerts="dashboard.alerts.value" />
+    </div>
+    <p class="sr-only" aria-live="polite">{{ dashboard.announcement.value }}</p>
   </main>
 </template>

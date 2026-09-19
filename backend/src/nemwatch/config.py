@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     aemo_read_timeout_seconds: float = 15.0
     aemo_max_response_bytes: int = 10_000_000
     aemo_user_agent: str = "NEMWatch/0.1 educational-project"
+    frontend_origin: str = "http://localhost:5173"
 
     model_config = SettingsConfigDict(
         env_file=".env",

@@ -1,5 +1,19 @@
 # NEMWatch Learning Log
 
+## Milestone 5 Accessible market dashboard
+
+### Concept
+
+An operational chart needs a textual equivalent. A trend line helps quick scanning, while the adjacent table preserves exact intervals and values for keyboard, screen-reader, and detailed review use.
+
+### Project example
+
+The history panel renders price movement as responsive SVG and repeats the same timestamp, price, and demand series in a captioned table. Every asynchronous section also has initial, loading, empty, failure, and retry behavior.
+
+### Deferred verification
+
+Typed-client and component cases are checked in now. The complete Vitest suite runs during consolidated stabilization.
+
 ## Milestone 4 Typed REST API
 
 ### Concept

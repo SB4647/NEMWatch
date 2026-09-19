@@ -2,6 +2,7 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import ValidationError
 
 from nemwatch.api.health import router as health_router
@@ -37,6 +38,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app = FastAPI(title="NEMWatch API", version="0.1.0", lifespan=lifespan)
     app.state.settings = active_settings
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[active_settings.frontend_origin],
+        allow_credentials=False,
+        allow_methods=["GET", "POST", "DELETE"],
+        allow_headers=["Content-Type", "X-Correlation-ID"],
+    )
     install_problem_handlers(app)
     app.include_router(health_router)
     app.include_router(regions_router)
