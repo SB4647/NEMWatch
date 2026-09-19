@@ -4,6 +4,8 @@ from typing import Any
 
 from fastapi import WebSocket
 
+from nemwatch.observability.metrics import WEBSOCKET_CONNECTIONS
+
 
 @dataclass
 class ClientConnection:
@@ -26,6 +28,7 @@ class ConnectionHub:
         self._clients[websocket] = ClientConnection(
             queue=queue, sender=asyncio.create_task(self._send(websocket, queue))
         )
+        WEBSOCKET_CONNECTIONS.inc()
 
     async def _send(self, websocket: WebSocket, queue: asyncio.Queue[dict[str, Any]]) -> None:
         while True:
@@ -46,4 +49,4 @@ class ConnectionHub:
         connection = self._clients.pop(websocket, None)
         if connection is not None:
             connection.sender.cancel()
-
+            WEBSOCKET_CONNECTIONS.dec()

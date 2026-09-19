@@ -28,6 +28,8 @@ class Settings(BaseSettings):
     live_consumer_group: str = "nemwatch-api-live-v1"
     websocket_queue_size: int = 100
     stale_check_interval_seconds: float = 60.0
+    readiness_timeout_seconds: float = 2.0
+    processor_metrics_port: int = 9000
 
     model_config = SettingsConfigDict(
         env_file=".env",

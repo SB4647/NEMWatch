@@ -1,5 +1,19 @@
 # NEMWatch Learning Log
 
+## Milestone 9 Observable resilient services
+
+### Concept
+
+Liveness and readiness serve different recovery decisions. Liveness answers whether the process can respond; readiness answers whether this instance can currently serve dependency-backed traffic.
+
+### Project example
+
+The API stays live when PostgreSQL or Redpanda is unavailable, while `/health/ready` reports each dependency as `up` or `down`. Prometheus captures that state alongside bounded-route HTTP metrics, ingestion, processing, alert, replay, and WebSocket behavior.
+
+### Deferred verification
+
+Logging, redaction, metric-label, readiness, provisioning, and outage cases are checked in or specified. The complete observability and recovery suite runs during consolidated stabilization.
+
 ## Milestone 8 Controlled historical replay
 
 ### Concept

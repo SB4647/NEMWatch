@@ -11,6 +11,7 @@ from nemwatch.domain.models import DispatchRecord, Region, ReplayJob, ReplayStat
 from nemwatch.ingestion.parser import parse_dispatch_csv
 from nemwatch.live.hub import ConnectionHub
 from nemwatch.persistence.repositories import ReplayRepository
+from nemwatch.observability.metrics import REPLAY_DURATION, REPLAY_JOBS
 from nemwatch.streaming.producer import EventProducer
 
 REPLAY_LOCK_KEY = 0x4E454D57
@@ -129,6 +130,11 @@ class ReplayService:
     async def _finish(self, job_id: UUID, status: ReplayStatus) -> None:
         updated = await self._update(job_id, status=status, completed_at=datetime.now(UTC))
         if updated is not None:
+            REPLAY_JOBS.labels(status.value).inc()
+            if updated.started_at is not None:
+                REPLAY_DURATION.labels(status.value).observe(
+                    max(0.0, (datetime.now(UTC) - updated.started_at).total_seconds())
+                )
             await self._broadcast(updated)
 
     async def _broadcast(self, job: ReplayJob) -> None:

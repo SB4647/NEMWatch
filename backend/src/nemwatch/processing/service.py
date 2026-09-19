@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from nemwatch.domain.events import DispatchObservedV1
 from nemwatch.domain.models import Alert, AlertRule, AlertRuleType, DispatchRecord, Region
 from nemwatch.persistence.repositories import AlertRepository, DispatchRepository
+from nemwatch.observability.metrics import ALERTS, EVENTS
 from nemwatch.streaming.producer import EventProducer
 
 AlertEvaluator = Callable[
@@ -67,6 +68,7 @@ class ProcessorService:
                 reason="dispatch_event_validation_failed",
             )
             await self._commit(topic, partition, offset)
+            EVENTS.labels("consume", topic, "dead_letter").inc()
             return
 
         new_alerts: list[Alert] = []
@@ -85,6 +87,8 @@ class ProcessorService:
                         new_alerts.append(alert)
         for alert in new_alerts:
             await self.producer.publish_alert(alert, event.correlation_id)
+            ALERTS.labels(alert.rule_key, alert.region.value).inc()
+        EVENTS.labels("process", topic, "success").inc()
         await self._commit(topic, partition, offset)
 
     async def _stale_loop(self, stop_event: asyncio.Event) -> None:
@@ -113,6 +117,7 @@ class ProcessorService:
                                 new_alerts.append(alert)
                 for alert in new_alerts:
                     await self.producer.publish_alert(alert, alert.id)
+                    ALERTS.labels(alert.rule_key, alert.region.value).inc()
 
     async def _commit(self, topic: str, partition: int, offset: int) -> None:
         await self.consumer.commit({

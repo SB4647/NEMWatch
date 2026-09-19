@@ -1,0 +1,22 @@
+{
+  "annotations": {"list": []},
+  "editable": false,
+  "panels": [
+    {"type": "timeseries", "title": "API request rate", "targets": [{"expr": "sum(rate(nemwatch_http_requests_total[5m])) by (route)", "legendFormat": "{{route}}"}], "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}},
+    {"type": "timeseries", "title": "API latency p95", "targets": [{"expr": "histogram_quantile(0.95, sum(rate(nemwatch_http_request_duration_seconds_bucket[5m])) by (le, route))", "legendFormat": "{{route}}"}], "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}},
+    {"type": "timeseries", "title": "Ingestion rows", "targets": [{"expr": "sum(rate(nemwatch_ingestion_rows_total[5m])) by (outcome)", "legendFormat": "{{outcome}}"}], "gridPos": {"h": 8, "w": 8, "x": 0, "y": 8}},
+    {"type": "timeseries", "title": "Event throughput", "targets": [{"expr": "sum(rate(nemwatch_events_total[5m])) by (stage, outcome)", "legendFormat": "{{stage}} {{outcome}}"}], "gridPos": {"h": 8, "w": 8, "x": 8, "y": 8}},
+    {"type": "timeseries", "title": "Alerts raised", "targets": [{"expr": "sum(rate(nemwatch_alerts_raised_total[5m])) by (rule, region)", "legendFormat": "{{rule}} {{region}}"}], "gridPos": {"h": 8, "w": 8, "x": 16, "y": 8}},
+    {"type": "stat", "title": "Dependency readiness", "targets": [{"expr": "nemwatch_readiness", "legendFormat": "{{component}}"}], "gridPos": {"h": 6, "w": 8, "x": 0, "y": 16}},
+    {"type": "stat", "title": "Live clients", "targets": [{"expr": "nemwatch_websocket_connections"}], "gridPos": {"h": 6, "w": 8, "x": 8, "y": 16}},
+    {"type": "timeseries", "title": "Replay outcomes", "targets": [{"expr": "sum(increase(nemwatch_replay_jobs_total[1h])) by (status)", "legendFormat": "{{status}}"}], "gridPos": {"h": 6, "w": 8, "x": 16, "y": 16}}
+  ],
+  "refresh": "10s",
+  "schemaVersion": 41,
+  "tags": ["nemwatch", "local"],
+  "templating": {"list": []},
+  "time": {"from": "now-1h", "to": "now"},
+  "title": "NEMWatch overview",
+  "uid": "nemwatch-overview",
+  "version": 1
+}

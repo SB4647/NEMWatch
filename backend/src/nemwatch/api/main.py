@@ -18,6 +18,8 @@ from nemwatch.api.routes.websocket import router as websocket_router
 from nemwatch.config import Settings
 from nemwatch.live.consumer import consume_market_events
 from nemwatch.live.hub import ConnectionHub
+from nemwatch.observability.logging import configure_logging
+from nemwatch.observability.middleware import CorrelationMetricsMiddleware
 from nemwatch.persistence.database import create_engine, create_session_factory
 from nemwatch.replay.service import ReplayService
 from nemwatch.streaming.producer import EventProducer
@@ -37,6 +39,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             ) from None
     else:
         active_settings = settings
+    configure_logging("nemwatch-api", active_settings.log_level)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -67,6 +70,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app = FastAPI(title="NEMWatch API", version="0.1.0", lifespan=lifespan)
     app.state.settings = active_settings
     app.state.hub = ConnectionHub(active_settings.websocket_queue_size)
+    app.add_middleware(CorrelationMetricsMiddleware)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[active_settings.frontend_origin],
