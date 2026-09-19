@@ -1,5 +1,19 @@
 # NEMWatch Learning Log
 
+## Milestone 4 Typed REST API
+
+### Concept
+
+An API boundary should make expensive or ambiguous queries impossible by construction. Explicit region, time-range, limit, and offset validation protects both the database and the client contract.
+
+### Project example
+
+Dispatch history rejects reversed ranges, ranges longer than 31 days, and limits above 5,000 before the repository is called. Decimal values leave the API as strings so browser clients do not lose precision.
+
+### Deferred verification
+
+Repository-fake route cases are checked in with the endpoints. The complete API suite runs during consolidated stabilization.
+
 ## Milestone 3 Deterministic ingestion
 
 ### Concept
