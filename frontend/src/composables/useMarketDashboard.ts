@@ -1,7 +1,8 @@
-import { computed, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import { ApiError, type NemWatchClient } from '../api/client'
 import type { AlertItem, DispatchObservation, RegionCode, RegionInfo } from '../api/types'
+import { MarketSocket, marketWebSocketUrl, type ConnectionState, type MarketMessage } from '../api/live'
 
 export function useMarketDashboard(client: NemWatchClient) {
   const regions = ref<RegionInfo[]>([])
@@ -13,6 +14,7 @@ export function useMarketDashboard(client: NemWatchClient) {
   const historyLoading = ref(false)
   const error = ref<string | null>(null)
   const announcement = ref('')
+  const connectionState = ref<ConnectionState>('disconnected')
   let historyToken = 0
 
   const latestByRegion = computed(() => new Map(latest.value.map((item) => [item.region, item])))
@@ -49,6 +51,31 @@ export function useMarketDashboard(client: NemWatchClient) {
     }
   }
 
-  onMounted(refresh)
-  return { regions, latest, latestByRegion, history, alerts, selectedRegion, loading, historyLoading, error, announcement, refresh, loadHistory }
+  async function acknowledgeAlert(id: string, note: string): Promise<void> {
+    const updated = await client.acknowledgeAlert(id, note)
+    alerts.value = alerts.value.map((item) => item.id === id ? updated : item)
+    announcement.value = 'Alert acknowledged.'
+  }
+
+  function handleMessage(message: MarketMessage): void {
+    if (message.type === 'dispatch_observed') {
+      latest.value = [...latest.value.filter((item) => item.region !== message.data.region), message.data]
+      announcement.value = `${message.data.region} market data updated.`
+    } else if (message.type === 'alert_raised') {
+      alerts.value = [message.data, ...alerts.value.filter((item) => item.id !== message.data.id)]
+      announcement.value = `New ${message.data.severity} alert for ${message.data.region}.`
+    } else if (message.type === 'alert_acknowledged') {
+      alerts.value = alerts.value.map((item) => item.id === message.data.id ? message.data : item)
+    }
+  }
+
+  const socket = new MarketSocket(
+    marketWebSocketUrl(import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'),
+    handleMessage,
+    (state) => { connectionState.value = state },
+  )
+
+  onMounted(() => { void refresh(); socket.start() })
+  onBeforeUnmount(() => socket.stop())
+  return { regions, latest, latestByRegion, history, alerts, selectedRegion, loading, historyLoading, error, announcement, connectionState, refresh, loadHistory, acknowledgeAlert }
 }

@@ -1,5 +1,7 @@
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+import asyncio
+from contextlib import suppress
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,7 +12,10 @@ from nemwatch.api.problems import install_problem_handlers
 from nemwatch.api.routes.alerts import router as alerts_router
 from nemwatch.api.routes.dispatch import router as dispatch_router
 from nemwatch.api.routes.regions import router as regions_router
+from nemwatch.api.routes.websocket import router as websocket_router
 from nemwatch.config import Settings
+from nemwatch.live.consumer import consume_market_events
+from nemwatch.live.hub import ConnectionHub
 from nemwatch.persistence.database import create_engine, create_session_factory
 
 
@@ -33,11 +38,21 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         engine = create_engine(active_settings)
         app.state.engine = engine
         app.state.session_factory = create_session_factory(engine)
+        app.state.hub = ConnectionHub(active_settings.websocket_queue_size)
+        stop_event = asyncio.Event()
+        live_task = asyncio.create_task(
+            consume_market_events(active_settings, app.state.hub, stop_event)
+        )
         yield
+        stop_event.set()
+        live_task.cancel()
+        with suppress(asyncio.CancelledError, Exception):
+            await live_task
         await engine.dispose()
 
     app = FastAPI(title="NEMWatch API", version="0.1.0", lifespan=lifespan)
     app.state.settings = active_settings
+    app.state.hub = ConnectionHub(active_settings.websocket_queue_size)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[active_settings.frontend_origin],
@@ -50,4 +65,5 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(regions_router)
     app.include_router(dispatch_router)
     app.include_router(alerts_router)
+    app.include_router(websocket_router)
     return app

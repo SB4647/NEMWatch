@@ -25,6 +25,9 @@ class Settings(BaseSettings):
     processor_consumer_group: str = "nemwatch-processor-v1"
     kafka_request_timeout_ms: int = 10_000
     kafka_max_event_bytes: int = 1_000_000
+    live_consumer_group: str = "nemwatch-api-live-v1"
+    websocket_queue_size: int = 100
+    stale_check_interval_seconds: float = 60.0
 
     model_config = SettingsConfigDict(
         env_file=".env",

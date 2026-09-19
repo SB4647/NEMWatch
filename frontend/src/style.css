@@ -51,6 +51,14 @@ th, td { padding: .7rem; border-bottom: 1px solid #dce5eb; text-align: left; }
 .alert-card > div:first-child { display: flex; gap: .65rem; align-items: center; }
 .alert-card p { margin: .75rem 0; line-height: 1.45; }
 .alert-values { grid-template-columns: 1fr 1fr; font-size: .85rem; }
+.acknowledge { display: grid; gap: .35rem; margin-top: 1rem; }
+.acknowledge label { color: #455b71; font-size: .8rem; font-weight: 700; }
+.acknowledge div { display: flex; gap: .5rem; }
+.acknowledged-note { padding: .65rem; border-radius: .5rem; background: #eef8f6; color: #245b57; }
+.live-status { display: inline-flex; gap: .5rem; align-items: center; margin: 1rem 0 0; color: #d9f5f2; font-size: .85rem; font-weight: 700; }
+.live-status span { width: .65rem; height: .65rem; border-radius: 50%; background: #f0ad3d; }
+.live-status[data-state="connected"] span { background: #55d8a8; }
+.live-status[data-state="disconnected"] span { background: #f27b81; }
 .empty-panel, .status-banner { padding: 1rem; border: 1px dashed #9eb1be; border-radius: .75rem; color: #586b80; background: #f7fafb; }
 .status-banner { display: flex; gap: 1rem; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; border-style: solid; }
 .status-banner--error { border-color: #d68c90; color: #7f2429; background: #fff2f2; }

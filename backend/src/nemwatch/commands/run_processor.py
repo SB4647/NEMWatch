@@ -2,6 +2,7 @@ import asyncio
 import signal
 
 from nemwatch.config import Settings
+from nemwatch.alerts.rules import evaluate_alerts
 from nemwatch.persistence.database import create_engine, create_session_factory
 from nemwatch.processing.service import ProcessorService
 from nemwatch.streaming.consumer import create_dispatch_consumer
@@ -18,7 +19,8 @@ async def main() -> None:
     for name in (signal.SIGINT, signal.SIGTERM):
         loop.add_signal_handler(name, stop_event.set)
     service = ProcessorService(
-        create_dispatch_consumer(settings), EventProducer(settings), create_session_factory(engine)
+        create_dispatch_consumer(settings), EventProducer(settings), create_session_factory(engine),
+        evaluate_alerts, settings.stale_check_interval_seconds,
     )
     try:
         await service.run(stop_event)

@@ -37,6 +37,7 @@ async def list_alerts(
 
 @router.post("/{alert_id}/acknowledge", response_model=AlertResponse)
 async def acknowledge_alert(
+    request: Request,
     alert_id: UUID,
     body: AcknowledgeRequest,
     repository: Annotated[AlertRepository, Depends(get_alert_repository)],
@@ -45,4 +46,7 @@ async def acknowledge_alert(
     if alert is None:
         raise problem(404, "alert_not_found", "Alert was not found")
     await repository.session.commit()
+    await request.app.state.hub.broadcast({
+        "type": "alert_acknowledged", "data": AlertResponse.from_domain(alert).model_dump(mode="json")
+    })
     return AlertResponse.from_domain(alert)

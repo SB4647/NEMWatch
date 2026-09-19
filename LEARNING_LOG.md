@@ -1,5 +1,19 @@
 # NEMWatch Learning Log
 
+## Milestone 7 Live operational alerts
+
+### Concept
+
+Live delivery must not sit inside the persistence critical path. Each WebSocket client has a bounded queue, so a slow browser can be disconnected without delaying database commits, Kafka consumption, or other users.
+
+### Project example
+
+High-price, rapid-demand, and stale-data rules create stable idempotency keys. Newly stored alerts publish to Redpanda, the API live consumer fans them out, and the dashboard merges them by identifier before allowing a note-based acknowledgement.
+
+### Deferred verification
+
+Rule-boundary, slow-client, and live-status cases are checked in now. The complete alert and WebSocket suite runs during consolidated stabilization.
+
 ## Milestone 6 Durable dispatch pipeline
 
 ### Concept
