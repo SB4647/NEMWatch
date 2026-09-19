@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cp .env.example .env
+      - run: docker compose build api
+      - run: docker compose run --rm --no-deps api uv run pytest tests/unit -v
+      - run: docker compose run --rm --no-deps api uv run ruff check src tests
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run test:run
+      - run: npm run build
+
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cp .env.example .env
+      - run: docker compose up -d --wait postgres redpanda
+      - run: docker compose build api
+      - run: docker compose run --rm api uv run alembic upgrade head
+      - run: docker compose run --rm api uv run pytest tests/integration -v
+      - if: always()
+        run: docker compose down -v
+
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cp .env.example .env
+      - run: make demo
+      - run: docker compose run --rm browser
+      - if: failure()
+        run: docker compose logs --tail=300
+      - if: always()
+        run: docker compose down -v

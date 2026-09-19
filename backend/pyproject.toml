@@ -31,6 +31,9 @@ testpaths = ["tests"]
 filterwarnings = [
   "ignore:The anyio.abc.BlockingPortal alias is deprecated:DeprecationWarning:starlette.testclient",
 ]
+markers = [
+  "integration: requires the local PostgreSQL or Redpanda services",
+]
 
 [tool.ruff]
 target-version = "py313"

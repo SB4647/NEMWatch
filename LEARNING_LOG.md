@@ -1,5 +1,19 @@
 # NEMWatch Learning Log
 
+## Milestone 10 Reproducible portfolio workflow
+
+### Concept
+
+A portfolio demonstration is stronger when one browser journey crosses the real system boundaries. The smoke test loads the dashboard, starts replay through the REST API, receives processed alerts, and persists an acknowledgement rather than mocking those layers.
+
+### Project example
+
+GitHub Actions separates backend, frontend, integration, and browser jobs. `make demo` starts and seeds the real local topology; `make verify` runs the consolidated suites against the same documented workflow.
+
+### Deferred verification
+
+CI, Playwright, documentation, and deterministic commands are now present. The next phase executes the complete suite, captures final screenshots, records exact evidence, and fixes observed failures.
+
 ## Milestone 9 Observable resilient services
 
 ### Concept
