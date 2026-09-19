@@ -1,5 +1,19 @@
 # NEMWatch Learning Log
 
+## Milestone 6 Durable dispatch pipeline
+
+### Concept
+
+At-least-once processing requires ordering side effects deliberately. The processor persists the observation and alert decisions before committing the consumed Kafka offset, so a database failure leaves the event available for retry.
+
+### Project example
+
+Dispatch events are keyed by region and interval and validated again at the consumer boundary. Invalid envelopes go to a dead-letter topic before their offsets advance; valid events upsert PostgreSQL before the processor commits.
+
+### Deferred verification
+
+Serialization and processing-order cases are checked in now. Live PostgreSQL and Redpanda retry/idempotency tests run during consolidated stabilization.
+
 ## Milestone 5 Accessible market dashboard
 
 ### Concept

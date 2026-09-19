@@ -1,4 +1,4 @@
-.PHONY: up down logs ps test build verify
+.PHONY: up down logs ps test build verify ingest processor-logs
 
 up:
 	docker compose up --build -d
@@ -11,6 +11,12 @@ logs:
 
 ps:
 	docker compose ps
+
+ingest:
+	docker compose run --rm api python -m nemwatch.commands.load_fixture
+
+processor-logs:
+	docker compose logs --tail=200 processor
 
 test:
 	docker compose run --rm api uv run pytest -v

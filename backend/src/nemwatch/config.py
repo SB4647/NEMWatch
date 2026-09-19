@@ -19,6 +19,12 @@ class Settings(BaseSettings):
     aemo_max_response_bytes: int = 10_000_000
     aemo_user_agent: str = "NEMWatch/0.1 educational-project"
     frontend_origin: str = "http://localhost:5173"
+    dispatch_topic: str = "nem.dispatch.observed.v1"
+    alert_topic: str = "nem.alert.raised.v1"
+    dead_letter_topic: str = "nem.events.dead-letter.v1"
+    processor_consumer_group: str = "nemwatch-processor-v1"
+    kafka_request_timeout_ms: int = 10_000
+    kafka_max_event_bytes: int = 1_000_000
 
     model_config = SettingsConfigDict(
         env_file=".env",
