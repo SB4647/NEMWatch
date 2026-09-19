@@ -1,5 +1,19 @@
 # NEMWatch Learning Log
 
+## Milestone 2 Persistent market domain
+
+### Concept
+
+Idempotency belongs in the database boundary as well as application code. A PostgreSQL uniqueness constraint protects the invariant even when a message is retried, two workers race, or a caller bypasses an earlier duplicate check.
+
+### Project example
+
+`dispatch_observations` is unique on region and interval. The repository uses `ON CONFLICT DO UPDATE`, so receiving the same AEMO interval again refreshes its values while preserving a single observation.
+
+### Deferred verification
+
+Domain and repository cases are checked in with this milestone. Per the approved build-first workflow, the PostgreSQL integration suite runs during consolidated stabilization after Milestone 10.
+
 ## Milestone 1 Local runtime foundation
 
 ### Concept

@@ -10,6 +10,10 @@ class Settings(BaseSettings):
     database_url: NonBlankString
     kafka_bootstrap_servers: NonBlankString
     log_level: str = "INFO"
+    history_max_days: int = 31
+    history_default_limit: int = 500
+    history_max_limit: int = 5_000
+    acknowledgement_note_max_length: int = 500
 
     model_config = SettingsConfigDict(
         env_file=".env",
