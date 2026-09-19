@@ -18,3 +18,11 @@ Stopping PostgreSQL and Redpanda does not change `/health/live`; the API process
 - Backend unit tests and Ruff: PASS - all checks completed without failures.
 - Frontend component tests and production build: PASS - all checks completed without failures.
 - Git hygiene: PASS - no environment files, dependencies, caches, build output, or local volumes are tracked.
+
+### Review remediation
+
+- Required configuration: PASS - blank values are rejected and startup errors name only invalid settings.
+- Local access boundary: PASS - all published ports bind to `127.0.0.1`.
+- Credential hygiene: PASS - common environment, key, certificate, AWS, and service-account paths are ignored.
+- Container privileges: PASS - the API runs as UID 10001 and the frontend runs as UID 1000.
+- Post-review clean clone: PASS - 8 backend tests, Ruff, 2 frontend tests, production build, service health, and Git hygiene all passed.
