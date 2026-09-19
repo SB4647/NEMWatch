@@ -4,6 +4,7 @@ import AlertList from './components/AlertList.vue'
 import HistoryPanel from './components/HistoryPanel.vue'
 import LiveStatus from './components/LiveStatus.vue'
 import RegionOverview from './components/RegionOverview.vue'
+import ReplayControl from './components/ReplayControl.vue'
 import StatusBanner from './components/StatusBanner.vue'
 import { useMarketDashboard } from './composables/useMarketDashboard'
 
@@ -22,6 +23,7 @@ const dashboard = useMarketDashboard(api)
       <HistoryPanel v-model:selected-region="dashboard.selectedRegion.value" :regions="dashboard.regions.value" :items="dashboard.history.value" :loading="dashboard.historyLoading.value" @load="dashboard.loadHistory" />
       <AlertList :alerts="dashboard.alerts.value" @acknowledge="dashboard.acknowledgeAlert" />
     </div>
+    <ReplayControl :regions="dashboard.regions.value" :job="dashboard.replay.value" :error="dashboard.replayError.value" @start="dashboard.startReplay" @cancel="dashboard.cancelReplay" />
     <p class="sr-only" aria-live="polite">{{ dashboard.announcement.value }}</p>
   </main>
 </template>

@@ -2,6 +2,8 @@ from datetime import datetime
 from decimal import Decimal
 from uuid import UUID
 
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from nemwatch.domain.models import Alert, DispatchRecord, REGION_NAMES, Region, ReplayJob
@@ -115,3 +117,16 @@ class ReplayResponse(ApiModel):
         values = job.model_dump()
         values["status"] = job.status.value
         return cls(**values)
+
+
+class ReplayRequest(ApiModel):
+    source: Literal["dispatch_sample.csv"] = "dispatch_sample.csv"
+    regions: tuple[Region, ...] = Field(min_length=1)
+    speed: float = Field(gt=0, le=1_000)
+
+    @field_validator("regions")
+    @classmethod
+    def unique_regions(cls, value: tuple[Region, ...]) -> tuple[Region, ...]:
+        if len(set(value)) != len(value):
+            raise ValueError("regions must be unique")
+        return value

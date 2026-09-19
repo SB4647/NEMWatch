@@ -1,5 +1,19 @@
 # NEMWatch Learning Log
 
+## Milestone 8 Controlled historical replay
+
+### Concept
+
+Replay is safer when it reuses the production event boundary. It exercises serialization, broker routing, idempotent persistence, alert rules, and live delivery instead of maintaining a second database-loading path.
+
+### Project example
+
+The replay runner filters and orders the fixture, publishes through `EventProducer`, persists progress after each interval group, checks cancellation at least every 250 milliseconds, and uses a PostgreSQL advisory lock to admit only one active job.
+
+### Deferred verification
+
+API conflict, control-state, missing-source, and pipeline idempotency cases are checked in or specified. The complete replay suite runs during consolidated stabilization.
+
 ## Milestone 7 Live operational alerts
 
 ### Concept

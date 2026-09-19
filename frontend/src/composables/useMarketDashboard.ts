@@ -1,7 +1,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import { ApiError, type NemWatchClient } from '../api/client'
-import type { AlertItem, DispatchObservation, RegionCode, RegionInfo } from '../api/types'
+import type { AlertItem, DispatchObservation, RegionCode, RegionInfo, ReplayJob } from '../api/types'
 import { MarketSocket, marketWebSocketUrl, type ConnectionState, type MarketMessage } from '../api/live'
 
 export function useMarketDashboard(client: NemWatchClient) {
@@ -15,6 +15,8 @@ export function useMarketDashboard(client: NemWatchClient) {
   const error = ref<string | null>(null)
   const announcement = ref('')
   const connectionState = ref<ConnectionState>('disconnected')
+  const replay = ref<ReplayJob | null>(null)
+  const replayError = ref<string | null>(null)
   let historyToken = 0
 
   const latestByRegion = computed(() => new Map(latest.value.map((item) => [item.region, item])))
@@ -57,6 +59,21 @@ export function useMarketDashboard(client: NemWatchClient) {
     announcement.value = 'Alert acknowledged.'
   }
 
+  async function startReplay(selected: RegionCode[], speed: number): Promise<void> {
+    replayError.value = null
+    try {
+      replay.value = await client.startReplay(selected, speed)
+      localStorage.setItem('nemwatch-replay-id', replay.value.id)
+    } catch (caught) {
+      replayError.value = caught instanceof ApiError ? caught.message : 'Replay could not be started.'
+    }
+  }
+
+  async function cancelReplay(): Promise<void> {
+    if (!replay.value) return
+    replay.value = await client.cancelReplay(replay.value.id)
+  }
+
   function handleMessage(message: MarketMessage): void {
     if (message.type === 'dispatch_observed') {
       latest.value = [...latest.value.filter((item) => item.region !== message.data.region), message.data]
@@ -66,6 +83,11 @@ export function useMarketDashboard(client: NemWatchClient) {
       announcement.value = `New ${message.data.severity} alert for ${message.data.region}.`
     } else if (message.type === 'alert_acknowledged') {
       alerts.value = alerts.value.map((item) => item.id === message.data.id ? message.data : item)
+    } else if (message.type === 'replay_progress') {
+      replay.value = message.data
+      if (['completed', 'cancelled', 'failed'].includes(message.data.status)) {
+        localStorage.removeItem('nemwatch-replay-id')
+      }
     }
   }
 
@@ -75,7 +97,12 @@ export function useMarketDashboard(client: NemWatchClient) {
     (state) => { connectionState.value = state },
   )
 
-  onMounted(() => { void refresh(); socket.start() })
+  onMounted(() => {
+    void refresh()
+    const replayId = localStorage.getItem('nemwatch-replay-id')
+    if (replayId) void client.getReplay(replayId).then((job) => { replay.value = job }).catch(() => localStorage.removeItem('nemwatch-replay-id'))
+    socket.start()
+  })
   onBeforeUnmount(() => socket.stop())
-  return { regions, latest, latestByRegion, history, alerts, selectedRegion, loading, historyLoading, error, announcement, connectionState, refresh, loadHistory, acknowledgeAlert }
+  return { regions, latest, latestByRegion, history, alerts, selectedRegion, loading, historyLoading, error, announcement, connectionState, replay, replayError, refresh, loadHistory, acknowledgeAlert, startReplay, cancelReplay }
 }

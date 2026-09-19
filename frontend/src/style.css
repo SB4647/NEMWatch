@@ -62,6 +62,17 @@ th, td { padding: .7rem; border-bottom: 1px solid #dce5eb; text-align: left; }
 .empty-panel, .status-banner { padding: 1rem; border: 1px dashed #9eb1be; border-radius: .75rem; color: #586b80; background: #f7fafb; }
 .status-banner { display: flex; gap: 1rem; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; border-style: solid; }
 .status-banner--error { border-color: #d68c90; color: #7f2429; background: #fff2f2; }
+.replay-panel { margin-top: 1.5rem; }
+.replay-form { display: flex; flex-wrap: wrap; gap: 1rem; align-items: end; }
+.replay-form fieldset { display: flex; gap: .75rem; margin: 0; padding: .55rem .75rem; border: 1px solid #aebfcb; border-radius: .55rem; }
+.replay-form fieldset label { white-space: nowrap; }
+.replay-form input[type="checkbox"] { width: auto; min-height: auto; }
+.replay-form > label { display: grid; gap: .35rem; color: #455b71; font-size: .8rem; font-weight: 700; }
+.button-secondary { color: #0b5e68; background: #dceff0; }
+.replay-progress { margin-top: 1rem; padding: 1rem; border-radius: .75rem; background: #f3f8fa; }
+.replay-progress > div { display: flex; justify-content: space-between; }
+.replay-progress progress { width: 100%; margin-top: .75rem; accent-color: #087c8c; }
+.form-error { color: #942d33; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 @media (max-width: 1050px) { .region-grid { grid-template-columns: repeat(2, 1fr); } .content-grid { grid-template-columns: 1fr; } }
 @media (max-width: 720px) { .hero { align-items: stretch; flex-direction: column; } .filters { grid-template-columns: 1fr; } }
