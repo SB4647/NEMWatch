@@ -12,6 +12,8 @@ NEMWatch is an educational monitoring and alerting platform for public Australia
 
 Host Python, uv, Node, PostgreSQL, and Redpanda installations are not required.
 
+The values in `.env.example` are development-only defaults for the loopback-bound local stack. They are not production-safe credentials.
+
 ## Start the local stack
 
 ```powershell

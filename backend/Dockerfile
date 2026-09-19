@@ -12,5 +12,9 @@ COPY src ./src
 COPY tests ./tests
 RUN uv sync --locked
 
+RUN useradd --create-home --uid 10001 appuser \
+    && chown -R appuser:appuser /app
+USER appuser
+
 EXPOSE 8000
-CMD ["uv", "run", "uvicorn", "nemwatch.api.main:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "nemwatch.api.main:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000"]

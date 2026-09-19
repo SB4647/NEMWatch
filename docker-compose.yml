@@ -1,3 +1,4 @@
+# Local development only. Checked-in sample credentials are not production-safe.
 name: nemwatch
 
 services:
@@ -8,7 +9,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -42,8 +43,8 @@ services:
       - --advertise-rpc-addr
       - redpanda:33145
     ports:
-      - "19092:19092"
-      - "9644:9644"
+      - "127.0.0.1:19092:19092"
+      - "127.0.0.1:9644:9644"
     volumes:
       - redpanda_data:/var/lib/redpanda/data
     healthcheck:
@@ -61,7 +62,7 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
       LOG_LEVEL: ${LOG_LEVEL}
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -80,7 +81,7 @@ services:
     environment:
       VITE_API_BASE_URL: ${VITE_API_BASE_URL}
     ports:
-      - "5173:5173"
+      - "127.0.0.1:5173:5173"
     depends_on:
       api:
         condition: service_healthy
