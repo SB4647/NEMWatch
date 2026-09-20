@@ -41,6 +41,7 @@ export class MarketSocket {
   }
 }
 
-export function marketWebSocketUrl(apiBase: string): string {
-  return `${apiBase.replace(/^http/, 'ws')}/ws/market`
+export function marketWebSocketUrl(apiBase: string, pageOrigin = window.location.origin): string {
+  const base = (apiBase || pageOrigin).replace(/\/$/, '')
+  return `${base.replace(/^http/, 'ws')}/ws/market`
 }

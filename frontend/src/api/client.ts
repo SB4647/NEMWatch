@@ -19,7 +19,7 @@ export class NemWatchClient {
   ) {}
 
   private async request<T>(path: string, init?: RequestInit): Promise<T> {
-    const response = await this.fetchFn(`${this.baseUrl}${path}`, {
+    const response = await this.fetchFn.call(globalThis, `${this.baseUrl}${path}`, {
       ...init,
       headers: { 'Content-Type': 'application/json', ...init?.headers },
     })
@@ -71,4 +71,5 @@ export class NemWatchClient {
   }
 }
 
-export const api = new NemWatchClient(import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000')
+export const apiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim() || ''
+export const api = new NemWatchClient(apiBaseUrl)

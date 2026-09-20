@@ -3,6 +3,19 @@ import { describe, expect, it, vi } from 'vitest'
 import { NemWatchClient } from '../../src/api/client'
 
 describe('NemWatchClient', () => {
+  it('invokes the browser fetch function with the global object', async () => {
+    const fetchFn = vi.fn(function (this: unknown) {
+      if (this !== globalThis) throw new TypeError('Illegal invocation')
+      return Promise.resolve(new Response(JSON.stringify([]), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }))
+    }) as unknown as typeof fetch
+    const client = new NemWatchClient('', fetchFn)
+
+    await expect(client.getRegions()).resolves.toEqual([])
+  })
+
   it('encodes history query values', async () => {
     const fetchFn = vi.fn().mockResolvedValue(new Response(JSON.stringify({ items: [], limit: 5, offset: 0, has_more: false }), { status: 200, headers: { 'Content-Type': 'application/json' } }))
     const client = new NemWatchClient('http://api.test', fetchFn)

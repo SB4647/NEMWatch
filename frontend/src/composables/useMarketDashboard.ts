@@ -1,6 +1,6 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
-import { ApiError, type NemWatchClient } from '../api/client'
+import { ApiError, apiBaseUrl, type NemWatchClient } from '../api/client'
 import type { AlertItem, DispatchObservation, RegionCode, RegionInfo, ReplayJob } from '../api/types'
 import { MarketSocket, marketWebSocketUrl, type ConnectionState, type MarketMessage } from '../api/live'
 
@@ -92,7 +92,7 @@ export function useMarketDashboard(client: NemWatchClient) {
   }
 
   const socket = new MarketSocket(
-    marketWebSocketUrl(import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'),
+    marketWebSocketUrl(apiBaseUrl),
     handleMessage,
     (state) => { connectionState.value = state },
   )
