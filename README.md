@@ -30,17 +30,33 @@ Open http://localhost:5173, start a fast replay, inspect the high-price and rapi
 
 ## Event flow
 
-```text
-Attributed fixture / optional AEMO HTTPS source
-                   |
-                   v
-        nem.dispatch.observed.v1
-                   |
-                   v
-      processor -> PostgreSQL -> FastAPI REST
-          |                          |
-          v                          v
-   nem.alert.raised.v1 ------> WebSocket hub ------> Vue dashboard
+```mermaid
+flowchart LR
+    Fixture[Demonstration CSV fixture]
+    AEMO[Optional AEMO HTTPS source]
+    Replay[Historical replay]
+
+    DispatchTopic[[Redpanda<br/>dispatch topic]]
+    Processor[Market processor]
+    Database[(PostgreSQL)]
+    AlertTopic[[Redpanda<br/>alert topic]]
+    API[FastAPI]
+    Dashboard[Vue dashboard]
+
+    Fixture --> DispatchTopic
+    AEMO -. optional .-> DispatchTopic
+    Replay --> DispatchTopic
+
+    DispatchTopic --> Processor
+    Processor --> Database
+    Processor --> AlertTopic
+
+    Database --> API
+    DispatchTopic --> API
+    AlertTopic --> API
+
+    API -->|REST| Dashboard
+    API -->|WebSocket| Dashboard
 ```
 
 Replay publishes to the normal dispatch topic. The processor commits a consumed offset only after the database transaction succeeds. Regional intervals and alert idempotency keys remain unique when delivery is repeated.
